@@ -1,6 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    document.querySelectorAll('.get_messages').forEach(button => {
+    //Load messages for current session channel
+    // Initialize new request
+    const request = new XMLHttpRequest(); 
+    request.open('GET', '/get_messages');
+    // Callback function for when request completes
+    request.onload = () => {
+
+        // Extract JSON data from request
+        const data = JSON.parse(request.responseText);
+        console.log(data)
+
+        for (message in data) { 
+            console.log(data[message][2]);
+            const p = document.createElement('p');
+            p.innerHTML = "<b>" + data[message][0] +  "</b> " + " " + data[message][1] + " - " + data[message][2]
+            document.querySelector('#messages').append(p);
+        }
+    }
+    // Send request
+    request.send();
+    
+
+    /*document.querySelectorAll('.get_messages').forEach(button => {
         button.onclick = () => {
 
             // Initialize new request
@@ -27,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             request.send();
             return false;
         };
-    });
+    });*/
     
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
     

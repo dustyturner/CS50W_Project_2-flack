@@ -16,7 +16,7 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-channels = {}
+channels = {'general': []}
 
 def login_required(f):
     @wraps(f)
@@ -70,15 +70,15 @@ def create_channel():
         channels[name] = [] 
         session['channel'] = name
         print("user: " + session['user'] + "is using channel: " + session['channel'])
+        print("why the fuck")
+        print(channels)
         return redirect(url_for('channel', name=name))
     return redirect("/")
 
-@app.route("/get_messages/<string:channel>")
-def get_messages(channel):
-    messages = channels[channel]
+@app.route("/get_messages")
+def get_messages():
+    messages = channels[session['channel']]
     return jsonify(messages)
-
-
 
 @socketio.on("connected")
 def connected():
