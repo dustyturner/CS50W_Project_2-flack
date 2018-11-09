@@ -7,21 +7,23 @@
     </head>
     <body>
 
-        <form action="/create_channel" method="POST">
-            <input type="text" name="name" placeholder="Enter Channel Name">
+        <form id="create_channel" >
+            <input type="text" id="name" placeholder="Enter Channel Name">
             <button type="submit">Create</button>
         </form>
 
         <div id="channels">
             {% for channel in channels %}
-                <h1><a href="{{ url_for('channel', name=channel) }}">{{ channel }}</a></h1>
-                <button class="get_messages" data-name ="{{ channel }}">{{ channel }}</button>
+                <button class="channel_select" data-name ="{{ channel }}">{{ channel }}</button>
             {% endfor %}
         </div>
+
         <form id="send_message">
             <input type="text" id="message" name="message" placeholder="New Message">
             <button type="submit">Send</button>
         </form>
+
         <div id="messages"></div>
+
     </body>
 </html>
