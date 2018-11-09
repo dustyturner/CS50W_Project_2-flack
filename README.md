@@ -1,2 +1,3 @@
-# flack
-project2 of CS50W - a basic chat app
+# Project 2
+
+Web Programming with Python and JavaScript
