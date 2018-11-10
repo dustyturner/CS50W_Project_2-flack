@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     socket.on('connect', () => {
 
-        socket.emit('connected');
+        socket.emit('join channel', name=0);
 
         load_messages()
         
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.onclick = () => {
                 const name = button.dataset.name;
                 socket.emit('join channel', name);
-                load_messages()
+                window.location.reload();
             }
         });
 
@@ -50,21 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#create_channel').onsubmit = () => {
             const name = document.querySelector('#name').value;
             socket.emit('create channel', name)
-            load_messages();
-            return false;
+            socket.emit('join channel', name)
+            window.location.reload();
         };
     });
 
-    socket.on('new user', user => {
-        console.log(user);
-        const h2 = document.createElement('h2');
-        h2.innerHTML = user + " joined the chat";
-
-        document.querySelector('#messages').append(h2);
-    });
-
     socket.on('new channel', name => {
-        console.log(name);
         const button = document.createElement('button');
         button.innerHTML = name;
         button.onclick = () => {
