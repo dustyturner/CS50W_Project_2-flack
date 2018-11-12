@@ -75,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#create_channel').onsubmit = () => {
             const name = document.querySelector('#name').value;
             socket.emit('create channel', name)
+            document.querySelector('#name').value = '';
+            document.querySelector('#submit_channel').disabled = true;
             return false;
         };
     });
