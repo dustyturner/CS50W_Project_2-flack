@@ -66,8 +66,8 @@ def join_channel(name):
     if name is not 0:
         users[session.get('user')] = name
         
+    join_room(session.get('user'))
     current_channel = users[session.get('user')]
-    join_room(current_channel)
 
 
 @socketio.on("create channel")
@@ -76,9 +76,7 @@ def create_channel(name):
     if name not in channels:
         channels[name] = []
         emit("new channel", name, broadcast=True)
-    
     users[session.get('user')] = name
-    join_room(name)
 
 
 @socketio.on("send message")
@@ -87,5 +85,7 @@ def new_messsage(data):
     message = Message(data)
     current_channel = users[session.get('user')]
     channels[current_channel].append(message.__dict__) 
-    emit("new message", message.__dict__, room=current_channel, broadcast=True)
-        
+
+    for user in users:
+        if users[user] == current_channel:
+            emit("new message", message.__dict__, room=user, broadcast=True)

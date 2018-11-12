@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
             button.onclick = () => {
                 const name = button.dataset.name;
                 socket.emit('join channel', name);
-                window.location.reload();
+                load_messages()
             }
         });
 
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#create_channel').onsubmit = () => {
             const name = document.querySelector('#name').value;
             socket.emit('create channel', name)
-            window.location.reload();
+            return false;
         };
     });
 
