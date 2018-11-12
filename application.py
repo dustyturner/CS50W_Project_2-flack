@@ -26,7 +26,7 @@ class Message:
 
 
 channels = {'general': []}
-users = {}
+users = {'shitface': 'general', 'fuckbeast': 'general'}
 
 @app.route("/login", methods=("GET","POST"))
 def login():
