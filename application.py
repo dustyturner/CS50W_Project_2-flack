@@ -30,13 +30,6 @@ class Message:
 
         self.message = message
 
-# class User:
-#     def __init__(self, user):
-
-#         self.user = user
-#         self.channel = 'general'
-        
-
 channels = {'general': []}
 users = {}
 
@@ -76,29 +69,22 @@ def get_messages():
 def join_channel(name):
 
     if name is not 0:
-        if name not in channels:
-            print("channel does not exist")
-        else:
-            users[session.get('user')] = name
-    
+        users[session.get('user')] = name
+        
     current_channel = users[session.get('user')]
     join_room(current_channel)
-    print(f"Joined {current_channel}")
 
 
 @socketio.on("create channel")
 def create_channel(name):
     
-    if name in channels:
-        error = "Channel already exists"
-        print(error)
-    
-    else:
+    if name not in channels:
         channels[name] = []
-        users[session.get('user')] = name
-        join_room(name)
-        print(f"Joined {name}")
         emit("new channel", name, broadcast=True)
+    
+    users[session.get('user')] = name
+    join_room(name)
+
 
 @socketio.on("send message")
 def new_messsage(data):
