@@ -12,10 +12,12 @@ function load_messages() {
 
         // Extract JSON data from request
         const data = JSON.parse(request.responseText);
+        console.log(data)
 
         for (message in data) { 
+            console.log(data[message])
             const p = document.createElement('p');
-            p.innerHTML = "<b>" + data[message][0] +  "</b> " + " " + data[message][1] + " - " + data[message][2]
+            p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
             document.querySelector('#messages').prepend(p);
         }
     }

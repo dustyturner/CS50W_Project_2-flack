@@ -16,6 +16,27 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
+class Message:
+    def __init__(self, message):
+
+        self.user = session['user']
+        
+        now = datetime.datetime.now()
+        time = str(now.hour) + ":"
+        if now.minute < 10:
+            time += "0" 
+        time += str(now.minute)
+        self.time = time 
+
+        self.message = message
+
+# class User:
+#     def __init__(self, user):
+
+#         self.user = user
+#         self.channel = 'general'
+        
+
 channels = {'general': []}
 users = {}
 
@@ -47,7 +68,7 @@ def index():
 @app.route("/get_messages")
 def get_messages():
 
-    channel = users[session['user']]
+    channel = users[session.get("user")]
     messages = channels[channel] 
     return jsonify(messages)
 
@@ -58,9 +79,9 @@ def join_channel(name):
         if name not in channels:
             print("channel does not exist")
         else:
-            users[session['user']] = name
+            users[session.get('user')] = name
     
-    current_channel = users[session['user']]
+    current_channel = users[session.get('user')]
     join_room(current_channel)
     print(f"Joined {current_channel}")
 
@@ -74,26 +95,16 @@ def create_channel(name):
     
     else:
         channels[name] = []
-        users[session['user']] = name
+        users[session.get('user')] = name
         join_room(name)
         print(f"Joined {name}")
         emit("new channel", name, broadcast=True)
 
 @socketio.on("send message")
-def new_messsage(message):
+def new_messsage(data):
     
-    if not message:
-        error = "Enter a message"
-        print(error)
-
-    else:
-        current_channel = users[session['user']]
-        now = datetime.datetime.now()
-        time = str(now.hour) + ":" + str(now.minute)
-        new_message = {}
-        new_message['user'] = session['user']
-        new_message['time'] = time
-        new_message['message'] = message
-        channels[current_channel].append([session['user'], time, message]) 
-        emit("new message", new_message, room=current_channel, broadcast=True)
+        message = Message(data)
+        current_channel = users[session.get('user')]
+        channels[current_channel].append(message.__dict__) 
+        emit("new message", message.__dict__, room=current_channel, broadcast=True)
         
