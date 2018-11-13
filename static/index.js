@@ -1,29 +1,3 @@
-//Load messages for current session channel
-function load_messages() {
-
-    //clear current messages
-    document.querySelector('#messages').innerHTML = ""
-
-    // Initialize new request
-    const request = new XMLHttpRequest(); 
-    request.open('GET', '/get_messages');
-    // Callback function for when request completes
-    request.onload = () => {
-
-        // Extract JSON data from request
-        const data = JSON.parse(request.responseText);
-
-        for (message in data) { 
-            const p = document.createElement('p');
-            p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
-            document.querySelector('#messages').prepend(p);
-        }
-    }
-    // Send request
-    request.send();
-}
-
-
 document.addEventListener('DOMContentLoaded', () => {
 
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -31,6 +5,30 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('connect', () => {
 
         socket.emit('join channel', name=0);
+
+        function load_messages() {
+
+            //clear current messages
+            document.querySelector('#messages').innerHTML = ""
+
+            // Initialize new request
+            const request = new XMLHttpRequest(); 
+            request.open('GET', '/get_messages');
+            // Callback function for when request completes
+            request.onload = () => {
+
+                // Extract JSON data from request
+                const data = JSON.parse(request.responseText);
+
+                for (message in data) { 
+                    const p = document.createElement('p');
+                    p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
+                    document.querySelector('#messages').prepend(p);
+                }
+            }
+            // Send request
+            request.send();
+        }
 
         load_messages()
         
@@ -66,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
         function load_users() {
 
             //clear current users
-            document.querySelector('#channels').innerHTML = ""
+            document.querySelector('#users').innerHTML = ""
 
             // Initialize new request
             const request = new XMLHttpRequest(); 
@@ -129,33 +127,20 @@ document.addEventListener('DOMContentLoaded', () => {
             load_messages()
             return false;
         };
-    });
 
-    socket.on('new channel', name => {
-        const button = document.createElement('button');
-        button.innerHTML = name;
-        button.onclick = () => {
-            socket.emit('join channel', name);
-            load_messages()
-        };
-        document.querySelector('#channels').append(button);
-    });
+        socket.on('new channel', name => {
+            load_channels()
+        });
 
-    socket.on('new user', name => {
-        const button = document.createElement('button');
-        button.innerHTML = name;
-        button.onclick = () => {
-            console.log(name)
-            socket.emit('join chat', name)
-            load_messages()
-        };
-        document.querySelector('#users').append(button);
-    });
+        socket.on('new user', name => {
+            load_users()
+        });
 
-    socket.on('new message', message => {
-        console.log(message);
-        const p = document.createElement('p');
-        p.innerHTML = "<b>" + message.user +  "</b> " + " " + message.time + " - " + message.message;
-        document.querySelector('#messages').prepend(p);
+        socket.on('new message', message => {
+            console.log(message);
+            const p = document.createElement('p');
+            p.innerHTML = "<b>" + message.user +  "</b> " + " " + message.time + " - " + message.message;
+            document.querySelector('#messages').prepend(p);
+        });
     });
 });
