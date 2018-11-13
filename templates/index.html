@@ -8,15 +8,16 @@
     <body>
 
         <form id="create_channel" >
-            <input type="text" id="name" placeholder="Enter Channel Name">
+            <input type="text" id="channel_name" placeholder="Enter Channel Name">
             <button type="submit" id="submit_channel">Create</button>
         </form>
 
-        <div id="channels">
-            {% for channel in channels %}
-                <button class="channel_select" data-name ="{{ channel }}">{{ channel }}</button>
-            {% endfor %}
+        <div id="channels"></div>
+
+        <div id="users">
+            <p><b>Users Online</b> - click to chat:</p>
         </div>
+        <br>
 
         <form id="send_message">
             <input type="text" id="message" name="message" placeholder="New Message" autofocus autocomplete="off">

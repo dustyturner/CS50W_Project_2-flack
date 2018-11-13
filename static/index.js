@@ -12,10 +12,8 @@ function load_messages() {
 
         // Extract JSON data from request
         const data = JSON.parse(request.responseText);
-        console.log(data)
 
         for (message in data) { 
-            console.log(data[message])
             const p = document.createElement('p');
             p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
             document.querySelector('#messages').prepend(p);
@@ -24,6 +22,7 @@ function load_messages() {
     // Send request
     request.send();
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -35,13 +34,63 @@ document.addEventListener('DOMContentLoaded', () => {
 
         load_messages()
         
-        document.querySelectorAll('.channel_select').forEach(button => {
-            button.onclick = () => {
-                const name = button.dataset.name;
-                socket.emit('join channel', name);
-                load_messages()
+        function load_channels() {
+
+            //clear current channels
+            document.querySelector('#channels').innerHTML = ""
+
+            // Initialize new request
+            const request = new XMLHttpRequest(); 
+            request.open('GET', '/get_channels');
+            // Callback function for when request completes
+            request.onload = () => {
+
+                // Extract JSON data from request
+                const data = JSON.parse(request.responseText);
+
+                for (channel in data) { 
+                    const button = document.createElement('button');
+                    button.innerHTML = data[channel];
+                    button.onclick = () => {
+                        socket.emit('join channel', data[channel]);
+                        load_messages()
+                    };
+                    document.querySelector('#channels').append(button);
+                }
             }
-        });
+            // Send request
+            request.send();
+        }
+        load_channels()
+
+        function load_users() {
+
+            //clear current users
+            document.querySelector('#channels').innerHTML = ""
+
+            // Initialize new request
+            const request = new XMLHttpRequest(); 
+            request.open('GET', '/get_users');
+            // Callback function for when request completes
+            request.onload = () => {
+
+                // Extract JSON data from request
+                const data = JSON.parse(request.responseText);
+
+                for (user in data) { 
+                    const button = document.createElement('button');
+                    button.innerHTML = data[user];
+                    button.onclick = () => {
+                        socket.emit('join chat', data[user]);
+                        load_messages()
+                    };
+                    document.querySelector('#users').append(button);
+                }
+            }
+            // Send request
+            request.send();
+        }
+        load_users()
 
         // Button begins disabled by default
         document.querySelector('#submit_message').disabled = true
@@ -66,17 +115,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#submit_channel').disabled = true
         // Enable button only if there is text in the input field
         document.querySelector('#create_channel').onkeyup = () => {
-            if (document.querySelector('#name').value.length > 0)
+            if (document.querySelector('#channel_name').value.length > 0)
                 document.querySelector('#submit_channel').disabled = false;
             else
                 document.querySelector('#submit_channel').disabled = true;
         };
 
         document.querySelector('#create_channel').onsubmit = () => {
-            const name = document.querySelector('#name').value;
+            const name = document.querySelector('#channel_name').value;
             socket.emit('create channel', name)
-            document.querySelector('#name').value = '';
+            document.querySelector('#channel_name').value = '';
             document.querySelector('#submit_channel').disabled = true;
+            load_messages()
             return false;
         };
     });
@@ -89,6 +139,17 @@ document.addEventListener('DOMContentLoaded', () => {
             load_messages()
         };
         document.querySelector('#channels').append(button);
+    });
+
+    socket.on('new user', name => {
+        const button = document.createElement('button');
+        button.innerHTML = name;
+        button.onclick = () => {
+            console.log(name)
+            socket.emit('join chat', name)
+            load_messages()
+        };
+        document.querySelector('#users').append(button);
     });
 
     socket.on('new message', message => {
