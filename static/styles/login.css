@@ -1,0 +1,50 @@
+html, 
+body {
+    height: 100%;
+}
+
+body {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    background-image: url("/static/styles/login_background.jpg");
+}
+
+.display-2 {
+    margin-bottom: 20px;
+    color: white;
+}
+
+.form-signin {
+    border-radius: 10px;
+    width: 100%;
+    max-width: 330px;
+    padding: 15px;
+    margin: auto;
+    background-color: #000000dc;
+}
+
+.form-signin .form-control {
+    position: relative;
+    box-sizing: border-box;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 5px;
+    font-size: 16px;
+}
+
+.form-control {
+    align: left;
+    text-align: center;
+}
+
+.form-signin .form-control:focus {
+    z-index: 2;
+}
+
+.btn-secondary {
+    background-color: #dad2b4c2;
+}
