@@ -2,10 +2,9 @@ import os
 import requests
 from time import strftime, localtime
 
-from flask import Flask, jsonify, render_template, redirect, request, session, url_for
+from flask import Flask, jsonify, render_template, redirect, request, session
 from flask_session import Session
 from flask_socketio import SocketIO, emit, join_room
-from functools import wraps
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
@@ -105,7 +104,6 @@ def join_channel(name):
 @socketio.on("join chat")
 def join_chat(username):
     
-    print("chat received")
     names = [session.get('user'), username]
     names.sort()
     chat_name = '-'.join(names)
@@ -119,7 +117,6 @@ def new_messsage(data):
     
     message = Message(data)
     messages[current_channel[session.get('user')]].append(message.__dict__) 
-    print(f"message received from {session.get('user')} using channel {current_channel[session.get('user')]}")
     for user in current_channel:
         if current_channel[user] == current_channel[session.get('user')]:
             emit("new message", message.__dict__, room=user, broadcast=True)
