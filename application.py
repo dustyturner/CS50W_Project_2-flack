@@ -78,6 +78,14 @@ def get_chats():
     data.remove(session.get('user'))
     return jsonify(data)
 
+@app.route("/test")
+def test():
+
+    if session.get("user") is None:
+        return redirect("/login")
+
+    return render_template("test.html", channels=messages)
+
 
 @socketio.on("create channel")
 def create_channel(name):
@@ -107,17 +115,9 @@ def join_chat(username):
     names = [session.get('user'), username]
     names.sort()
     chat_name = '-'.join(names)
-<<<<<<< HEAD
-    print(f"{chat_name}")
     if chat_name not in messages:
         messages[chat_name] = []
     current_channel[session.get('user')] = chat_name
-    print(f"{current_channel[session.get('user')]}")
-=======
-    if chat_name not in messages:
-        messages[chat_name] = []
-    current_channel[session.get('user')] = chat_name
->>>>>>> 2eef7b3592207a2cc288aeab22b84e8160e7e9d3
 
 
 @socketio.on("send message")

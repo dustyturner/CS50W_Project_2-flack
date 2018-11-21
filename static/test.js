@@ -21,9 +21,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = JSON.parse(request.responseText);
 
                 for (message in data) { 
-                    const p = document.createElement('p');
-                    p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
-                    document.querySelector('#messages').prepend(p);
+                    const li = document.createElement('li');
+                    li.className = "list-group-item list-group-item-action flex-column align-items-start";
+                    const div = document.createElement('div');
+                    div.className = "d-flex w-100 justify-content-between";
+                    const h5 = document.createElement('h5');
+                    h5.className = "mb-1 font-weight-bold";
+                    h5.innerHTML = data[message].user;
+                    div.append(h5);
+                    const small = document.createElement('small');
+                    small.innerHTML = data[message].time;
+                    div.append(small);
+                    const pa = document.createElement('p');
+                    pa.className = "mb-1";
+                    pa.innerHTML = data[message].message;
+                    li.append(div)
+                    li.append(pa)
+                    document.querySelector('#messages').prepend(li);
                 }
             }
             // Send request
@@ -48,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (item in data) { 
                     const channel = data[item]
                     const button = document.createElement('button');
+                    button.className = "btn btn-outline-secondary"
                     button.innerHTML = channel;
                     button.onclick = () => {
-                        console.log(channel)
                         socket.emit('join channel', channel);
                         load_messages()
                     };
@@ -79,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (item in data) { 
                     const user = data[item]
                     const button = document.createElement('button');
+                    button.className = "btn btn-outline-secondary"
                     button.innerHTML = user;
                     button.onclick = () => {
                         console.log(user)
