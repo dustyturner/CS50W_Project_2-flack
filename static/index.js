@@ -1,30 +1,3 @@
-//Load messages for current session channel
-function load_messages() {
-
-    //clear current messages
-    document.querySelector('#messages').innerHTML = ""
-
-    // Initialize new request
-    const request = new XMLHttpRequest(); 
-    request.open('GET', '/get_messages');
-    // Callback function for when request completes
-    request.onload = () => {
-
-        // Extract JSON data from request
-        const data = JSON.parse(request.responseText);
-        console.log(data)
-
-        for (message in data) { 
-            console.log(data[message])
-            const p = document.createElement('p');
-            p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
-            document.querySelector('#messages').prepend(p);
-        }
-    }
-    // Send request
-    request.send();
-}
-
 document.addEventListener('DOMContentLoaded', () => {
 
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
@@ -33,15 +6,92 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.emit('join channel', name=0);
 
+        function load_messages() {
+
+            //clear current messages
+            document.querySelector('#messages').innerHTML = ""
+
+            // Initialize new request
+            const request = new XMLHttpRequest(); 
+            request.open('GET', '/get_messages');
+            // Callback function for when request completes
+            request.onload = () => {
+
+                // Extract JSON data from request
+                const data = JSON.parse(request.responseText);
+
+                for (message in data) { 
+                    const p = document.createElement('p');
+                    p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
+                    document.querySelector('#messages').prepend(p);
+                }
+            }
+            // Send request
+            request.send();
+        }
         load_messages()
         
-        document.querySelectorAll('.channel_select').forEach(button => {
-            button.onclick = () => {
-                const name = button.dataset.name;
-                socket.emit('join channel', name);
-                load_messages()
+        function load_channels() {
+
+            //clear current channels
+            document.querySelector('#channels').innerHTML = ""
+
+            // Initialize new request
+            const request = new XMLHttpRequest(); 
+            request.open('GET', '/get_channels');
+            // Callback function for when request completes
+            request.onload = () => {
+
+                // Extract JSON data from request
+                const data = JSON.parse(request.responseText);
+
+                for (item in data) { 
+                    const channel = data[item]
+                    const button = document.createElement('button');
+                    button.innerHTML = channel;
+                    button.onclick = () => {
+                        console.log(channel)
+                        socket.emit('join channel', channel);
+                        load_messages()
+                    };
+                    document.querySelector('#channels').append(button);
+                }
             }
-        });
+            // Send request
+            request.send();
+        }
+        load_channels()
+
+        function load_users() {
+
+            //clear current users
+            document.querySelector('#users').innerHTML = ""
+
+            // Initialize new request
+            const request = new XMLHttpRequest(); 
+            request.open('GET', '/get_users');
+            // Callback function for when request completes
+            request.onload = () => {
+
+                // Extract JSON data from request
+                const data = JSON.parse(request.responseText);
+
+                for (item in data) { 
+                    const user = data[item]
+                    const button = document.createElement('button');
+                    button.innerHTML = user;
+                    button.onclick = () => {
+                        console.log(user)
+                        socket.emit('join chat', user);
+                        load_messages()
+                    };
+                    document.querySelector('#users').append(button);
+                }
+            }
+            // Send request
+            request.send();
+        }
+        load_users()
 
         // Button begins disabled by default
         document.querySelector('#submit_message').disabled = true
@@ -66,35 +116,34 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('#submit_channel').disabled = true
         // Enable button only if there is text in the input field
         document.querySelector('#create_channel').onkeyup = () => {
-            if (document.querySelector('#name').value.length > 0)
+            if (document.querySelector('#channel_name').value.length > 0)
                 document.querySelector('#submit_channel').disabled = false;
             else
                 document.querySelector('#submit_channel').disabled = true;
         };
 
         document.querySelector('#create_channel').onsubmit = () => {
-            const name = document.querySelector('#name').value;
+            const name = document.querySelector('#channel_name').value;
             socket.emit('create channel', name)
-            document.querySelector('#name').value = '';
+            document.querySelector('#channel_name').value = '';
             document.querySelector('#submit_channel').disabled = true;
+            load_messages()
             return false;
         };
-    });
 
-    socket.on('new channel', name => {
-        const button = document.createElement('button');
-        button.innerHTML = name;
-        button.onclick = () => {
-            socket.emit('join channel', name);
-            load_messages()
-        };
-        document.querySelector('#channels').append(button);
-    });
+        socket.on('new channel', name => {
+            load_channels()
+        });
 
-    socket.on('new message', message => {
-        console.log(message);
-        const p = document.createElement('p');
-        p.innerHTML = "<b>" + message.user +  "</b> " + " " + message.time + " - " + message.message;
-        document.querySelector('#messages').prepend(p);
+        socket.on('new user', name => {
+            load_users()
+        });
+
+        socket.on('new message', message => {
+            console.log(message);
+            const p = document.createElement('p');
+            p.innerHTML = "<b>" + message.user +  "</b> " + " " + message.time + " - " + message.message;
+            document.querySelector('#messages').prepend(p);
+        });
     });
 });
