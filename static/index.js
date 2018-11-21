@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Send request
             request.send();
         }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2eef7b3592207a2cc288aeab22b84e8160e7e9d3
         load_messages()
         
         function load_channels() {
@@ -45,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Extract JSON data from request
                 const data = JSON.parse(request.responseText);
 
+<<<<<<< HEAD
                 for (item in data) { 
                     const channel = data[item]
                     const button = document.createElement('button');
@@ -52,6 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.onclick = () => {
                         console.log(channel)
                         socket.emit('join channel', channel);
+=======
+                for (channel in data) { 
+                    const button = document.createElement('button');
+                    button.innerHTML = data[channel];
+                    button.onclick = () => {
+                        socket.emit('join channel', data[channel]);
+>>>>>>> 2eef7b3592207a2cc288aeab22b84e8160e7e9d3
                         load_messages()
                     };
                     document.querySelector('#channels').append(button);
@@ -76,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Extract JSON data from request
                 const data = JSON.parse(request.responseText);
 
+<<<<<<< HEAD
                 for (item in data) { 
                     const user = data[item]
                     const button = document.createElement('button');
@@ -83,6 +96,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     button.onclick = () => {
                         console.log(user)
                         socket.emit('join chat', user);
+=======
+                for (user in data) { 
+                    const button = document.createElement('button');
+                    button.innerHTML = data[user];
+                    button.onclick = () => {
+                        socket.emit('join chat', data[user]);
+>>>>>>> 2eef7b3592207a2cc288aeab22b84e8160e7e9d3
                         load_messages()
                     };
                     document.querySelector('#users').append(button);
