@@ -1,2 +1,5 @@
 __pycache__
 flask_session
+flack_env
+.application.py.swp
+

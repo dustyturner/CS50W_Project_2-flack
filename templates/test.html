@@ -9,6 +9,7 @@
         <title>Navbar Template for Bootstrap</title>
         <!-- Bootstrap core CSS -->
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles/test.css') }}">
 
         <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
         <script src="{{ url_for('static', filename='test.js') }}"></script>
@@ -34,7 +35,7 @@
     <body>
         <div class="container-fluid">
             <div class="row">
-                <nav class="col-2 bg-light sidebar">
+                <nav class="col-2 bg-light sidebar" id="sidebar">
                         <h6 class="sidebar-heading align-items-center px-3 mt-4 mb-1 text-muted">Channels</h6>
                         <div class="nav flex-column" id="channels">
                             <button class="btn btn-outline-secondary"> General </button>
