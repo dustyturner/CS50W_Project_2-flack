@@ -6,21 +6,28 @@
 
 #sidebar {
     min-width: 250px;
-    max-width: 250px;
-    transition: all 0.3s;
-    background: darkorange;
+    max-width: 250;
+    background: #ffc27c;
     height: 100vh;
-    bottom: 0;
-    border-right: solid 2px lightgray;
-    border-left: solid 2px lightgray;
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 11;
+    border-right: solid 2px #ffc27c;
+    border-left: solid 2px #ffc27c;
+    transition: all 0.3s;
 }
 
-#sidebar.active {
+#sidebar.active, #messages.active, #new_message.active, #navbar.active {
     margin-left: -250px;
 }
 
 a[data-toggle="collapse"] {
     position: relative;
+}
+
+a:hover {
+    text-decoration: none
 }
 
 .dropdown-toggle::after {
@@ -32,10 +39,15 @@ a[data-toggle="collapse"] {
 }
 
 @media (max-width: 768px) {
-    #sidebar {
+    #sidebar, #new_message, #navbar, #messages {
         margin-left: -250px;
     }
-    #sidebar.active {
+
+    #sidebar.active{
+        margin-left: 0;
+    }
+
+    #new_message.active, #navbar.active, #messages.active {
         margin-left: 0;
     }
 }
@@ -54,23 +66,48 @@ a[data-toggle="collapse"] {
     margin-top: 5px;
 }
 
+h1 {
+    color: #dc0000;
+}
+
 #sidebar h1 {
     padding: 15px;
+    font-weight: bold;
 }
 
 #sidebar p {
+    color: #dc0000;
     padding-left:20px;
     padding-bottom: 5px;
     margin: 0px;
     font-weight: bold;
 }
 
+#sidebar a {
+    color: black;
+    font-weight: 200;
+}
+
 #sidebar ul li a {
     display: block;
 }
 
-#channels {
+#content {
+    padding-right: 20px;
+    margin: auto;
+    width: 100%;
+}
+
+#channels_section {
     margin-top: 40px;
+}
+
+#channels button {
+    color: red;
+    position: fixed;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left:30px;
 }
 
 .channel {
@@ -101,36 +138,39 @@ a[data-toggle="collapse"] {
     padding-left:30px;
 }
 
-.navbar {
-    background: white;
-} 
+#navbar, #messages, #new_message {
+    max-width: 1000px;
+}
 
 .navbar h1 {
-    border-bottom: solid 2px lightgray;
-    padding-left: 15px;
-    padding-right: 10px;
+    border-bottom: solid 2px #ffc27c;
+}
+
+#navbar {
+    background: white;
+    position: fixed;
+    top: 0px;
+    left: 250px;
+    right: 0px;
+    box-shadow: 20px 0px 10px 10px white;
+    margin-bottom: 10px;
+    transition: all 0.3s;
 }
 
 #chatting {
-    position: -webkit-sticky;
-    position: sticky;
     top: 72px;
-    background: white;
-    z-index: 10;
-    text-align: center;
     display: flex;
-    box-shadow: 0px 0px 10px 10px white;
-    margin-bottom: 10px;
 }
 
 #chatting h6 {
     margin: 10px;
+    color: #dc0000;
 }
 
 #chatting p {
     margin: 3px;
     padding: 5px;
-    background-color: lightgray;
+    background-color: #ffc27c;
     border-radius: 5px;
 }
 
@@ -138,13 +178,14 @@ a[data-toggle="collapse"] {
     margin: 5px;
     margin-left: 10px;
     border: none;
-    box-shadow: 0px 0px 3px -0px;
+    box-shadow: 0px 0px 3px -0px #dc0000;
     border-radius: 5px;
 }
 
 .list-group-item h6 {
     font-weight: bold;
     margin-top: 10px;
+    color: #dc0000;
 }
 
 .list-group-item small {
@@ -153,20 +194,35 @@ a[data-toggle="collapse"] {
 }
 
 .list-group-item p {
-    margin: 5px;
+    margin: 3px;
+    margin-left: 0px;
+}
+
+.list-group-item small {
+    margin-left: 10px;
 }
 
 #messages {
-    position: relative;
+    position: fixed;
+    overflow-y: auto;
+    right: 0;
+    bottom: 110px;
+    left: 250px;
+    height: 100;
+    max-height: 100%;
+    transition: all 0.3s;
 }
 
 #new_message {
-    position: -webkit-sticky;
-    position: sticky;
-    margin-top: 15px;
-    padding: 10px;
+    position: fixed;
+    bottom: 0px;
+    margin-bottom: 0px;
+    left: 250px;
+    right: 0px;
     bottom: 0;
     background: white;
-    box-shadow: 0px 0px 10px 10px white;
+    box-shadow: 0px 0px 5px 5px white;
+    transition: all 0.3s;
 }
+
 

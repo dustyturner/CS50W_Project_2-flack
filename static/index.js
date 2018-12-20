@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
-    
+
     socket.on('connect', () => {
 
         socket.emit('join channel', name=0);
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#messages').innerHTML = ""
 
             // Initialize new request
-            const request = new XMLHttpRequest(); 
+            const request = new XMLHttpRequest();
             request.open('GET', '/get_messages');
             // Callback function for when request completes
             request.onload = () => {
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Extract JSON data from request
                 const data = JSON.parse(request.responseText);
 
-                for (message in data) { 
+                for (message in data) {
                     const p = document.createElement('p');
                     p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
                     document.querySelector('#messages').prepend(p);
@@ -30,14 +30,14 @@ document.addEventListener('DOMContentLoaded', () => {
             request.send();
         }
         load_messages()
-        
+
         function load_channels() {
 
             //clear current channels
             document.querySelector('#channels').innerHTML = ""
 
             // Initialize new request
-            const request = new XMLHttpRequest(); 
+            const request = new XMLHttpRequest();
             request.open('GET', '/get_channels');
             // Callback function for when request completes
             request.onload = () => {
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Extract JSON data from request
                 const data = JSON.parse(request.responseText);
 
-                for (item in data) { 
+                for (item in data) {
                     const channel = data[item]
                     const button = document.createElement('button');
                     button.innerHTML = channel;
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#users').innerHTML = ""
 
             // Initialize new request
-            const request = new XMLHttpRequest(); 
+            const request = new XMLHttpRequest();
             request.open('GET', '/get_users');
             // Callback function for when request completes
             request.onload = () => {
@@ -76,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Extract JSON data from request
                 const data = JSON.parse(request.responseText);
 
-                for (item in data) { 
+                for (item in data) {
                     const user = data[item]
                     const button = document.createElement('button');
                     button.innerHTML = user;

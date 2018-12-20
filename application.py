@@ -31,6 +31,8 @@ current_channel = {'shitface': 'general', 'fuckbeast': 'general'}
 @app.route("/login", methods=("GET","POST"))
 def login():
 
+    session.clear()
+
     if request.method == "POST":
         username = request.form.get("username")
         if not username:
@@ -76,7 +78,7 @@ def get_channels():
 @app.route("/get_users")
 def get_chats():
 
-    data = []
+    daka = []
     for user in current_channel:
         data.append(user)
     data.remove(session.get('user'))
@@ -86,6 +88,7 @@ def get_chats():
 @socketio.on("create channel")
 def create_channel(name):
 
+    print(f"creating {name}")
     if name not in messages:
         messages[name] = []
         channels.append(name)
@@ -96,6 +99,7 @@ def create_channel(name):
 @socketio.on("join channel")
 def join_channel(name):
 
+    print(f"joining channel {name}")
     if session.get('user') not in current_channel:
         current_channel[session.get('user')] = 'general'
         emit("new user", session.get('user'), broadcast=True)

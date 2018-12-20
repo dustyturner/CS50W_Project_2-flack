@@ -1,255 +1,222 @@
-<html class="gr__getbootstrap_com" wtx-context="4B1AC8A6-FB25-4468-8388-F8075B813B6B" lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="description" content="">
-        <meta name="author" content="">
-        <link rel="icon" href="../../../../favicon.ico">
+<!DOCTYPE html>
+<html>
 
-        <title>Navbar Template for Bootstrap</title>
-        <!-- Bootstrap core CSS -->
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles/test.css') }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
 
-        <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
-        <script src="{{ url_for('static', filename='test.js') }}"></script>
+    <title>Collapsible sidebar using Bootstrap 4</title>
 
-        <!-- Custom styles for this template -->
-        <style>
-            .btn-outline-secondary {
-                border-radius: 0px;
-                margin-top: -1px;
-            }
-            .sidebar {
-              position: fixed;
-              top: 0;
-              bottom: 0;
-              left: 0;
-              z-index: 100; /* Behind the navbar */
-              padding: 48px 0 0; /* Height of navbar */
-              box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-            }
-        </style>
-    </head>
+    <!-- Bootstrap CSS CDN -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <!-- Our Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for("static", filename="styles/index.css") }}">
 
-    <body>
-        <div class="container-fluid">
-            <div class="row">
-                <nav class="col-2 bg-light sidebar" id="sidebar">
-                        <h6 class="sidebar-heading align-items-center px-3 mt-4 mb-1 text-muted">Channels</h6>
-                        <div class="nav flex-column" id="channels">
-                            <button class="btn btn-outline-secondary"> General </button>
-                            <button class="btn btn-outline-secondary"> General </button>
-                            <button class="btn btn-outline-secondary"> General </button>
-                            <button class="btn btn-outline-secondary"> General </button>
-                        </div>
-                        <form class="form-group p-1" id="create_channel">
-                            <input type="text" class="form-control text-center" id="channel_name" placeholder="channel name">
-                            <button type="submit" class="btn form-control btn-primary" id="submit_channel">New Channel</button>
-                        </form>
-                        <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">DMs</h6>
-                        <div class="nav flex-column" id="users">
-                            <button class="btn btn-outline-secondary"> General </button>
-                            <button class="btn btn-outline-secondary"> General </button>
-                            <button class="btn btn-outline-secondary"> General </button>
-                            <button class="btn btn-outline-secondary"> General </button>
-                        </div>
-                </nav>
-        
-                <div class="col-9 ml-auto px-4">
-                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                        <h1 class="h2">Dashboard</h1>
+    <!-- Font Awesome JS -->
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='test.js') }}"></script>
+</head>
+
+<body>
+
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+           <div class="sidebar-header">
+                <h1>flack</h1>
+            </div>
+            <ul class="list-unstyled components">
+                <div id="channels_section">
+                    <p>channels:</p>
+                    <script id="channel" type="text/template">
+                        {% raw -%}
+                        <li>
+                            <a href="#" class="channel" data-channel="{{ name }}">{{ name }}</a>
+                        </li>
+                        {%- endraw %}
+                    </script>
+                    <div id="channels">
                     </div>
-                    <form class="list-group" id="send_message">
-                        <input class="p-2" type="text" id="message" name="message" placehoder="type message...." autofocus>
-                        <div class="form-group my-2">
-                            <button class="btn btn-primary" type="submit" id="submit_message">send</button>
-                        </div>
+                    <form class="form-group m-0" id="create_channel">
+                        <p>create channel:</p>
+                        <input class="form-control" id="channel_input">
+                        <button type=submit class="btn btn-primary btn-danger" id="channel_submit">create</button>
                     </form>
-                    <ul class="list-group" id="messages">
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                        <li href="#" class="list-group-item list-group-item-action flex-column align-items-start">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">Fuckbeast</h5>
-                                <small>12:45</small>
-                            </div>
-                            <p class="mb-1">Donec id elit non mi porta gravida at eget metus. Maecenas sed diam eget risus varius blandit.</p>
-                        </li>
-                      </ul>
+                </div>
+                <div id="dms">
+                    <p>DMs:</p>
+                    <li>
+                        <a href="#" class="channel" onClick=fuckyeah()>fuckbeast</a>
+                    </li>
+                    <li>
+                        <a href="#" class="channel">shitface</a>
+                    </li>
+                    <!-- <li>
+                       <div id="users">
+                            <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">send a DM:</a>
+                            <ul class="collapse list-unstyled" id="pageSubmenu">
+                                <li>
+                                    <a href="#">fuckbeast</a>
+                                </li>
+                                <li>
+                                    <a href="#">assface</a>
+                                </li>
+                                <li>
+                                    <a href="#">titwank</a>
+                                </li>
+                            </ul>
+                       </div>
+                    </li> --->
+                </div>
+            </ul>
+        </nav>
 
+        <div id="content">
+            <nav id="navbar" class="navbar sticky-top navbar-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-info btn-danger">
+                        <span>&lt</span>
+                    </button>
+                    <h1>#general</h1>
+                </div>
+                <div id="chatting">
+                    <h6>chatting:</h6>
+                    <p class="online">shitbag</p>
+                    <p class="offline">assface</p>
+                    <p class="online">cockcheese</p>
+                    <p class="offline">knoblegs</p>
+                </div>
+            </nav>
+            <div id="messages">
+                <ul class="list-group">
+                    <script id="message" type="text/template">
+                        {% raw -%}
+                        <li class="list-group-item">
+                            <h6>{{ user }}</h6>
+                            <div class="d-flex justify-content-between">
+                                <p>{{ message }}</p>
+                                <small>{{ time  }}</small>
+                            </div>
+                        </li>
+                        {%- endraw %}
+                    </script>
+                    <li class="list-group-item">
+                        <h6>shitbag</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>asswank</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>shitbag</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>asswank</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>shitbag</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>asswank</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>shitbag</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>asswank</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>shitbag</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>asswank</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>shitbag</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        <h6>asswank</h6>
+                        <div class="d-flex justify-content-between">
+                            <p>Hello you shit bag of cocks</p>
+                            <small>{{ time  }}</small>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div id="new_message">
+                <form class="form-group" id="send_message">
+                    <input class="form-control" type="text" id="message" name="message" placehmder="type message...." autofocus>
+                    <div class="form-group my-2">
+                        <button class="btn btn-primary btn-danger" type="submit" id="submit_message">send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- jQuery CDN - Slim version (=without AJAX) -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <!-- Popper.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('#sidebarCollapse').on('click', function () {
+                $('#navbar').toggleClass('active');
+                $('#messages').toggleClass('active');
+                $('#sidebar').toggleClass('active');
+                $('#new_message').toggleClass('active');
+            });
+        });
+    </script>
 </body>
+
 </html>
