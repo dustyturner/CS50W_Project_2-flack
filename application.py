@@ -53,10 +53,12 @@ def index():
 
     return render_template("index.html", channels=messages)
 
+
 @app.route("/test")
 def test():
 
     return render_template("test.html")
+
 
 @app.route("/get_messages")
 def get_messages():
@@ -64,24 +66,40 @@ def get_messages():
     if session.get("user") not in current_channel:
         current_channel[session.get("user")] = 'general'
         emit('new user', session.get("user"), broadcast=True)
+
     channel = current_channel[session.get("user")]
-    channel_messages = messages[channel]
-    return jsonify(channel_messages)
+
+    try:
+        channel_messages = messages[channel]
+    except:
+        channel_messages = 0
+
+    if channel_messages:
+        print(f"returning {channel_messages}")
+        return jsonify(channel_messages)
+
+    print("returning no messages")
+    return "";
 
 
 @app.route("/get_channels")
 def get_channels():
 
-    return jsonify(channels)
+    user = session.get('user')
+    data = {'users': [], 'channels': [], 'current_channel': {}}
 
+    try:
+        data['current_channel'] = current_channel[user].split("-")
+        data['current_channel'].remove(user)
+    except:
+        data['current_channel'] = current_channel[user]
 
-@app.route("/get_users")
-def get_chats():
-
-    daka = []
     for user in current_channel:
-        data.append(user)
-    data.remove(session.get('user'))
+        data['users'].append(user)
+    data['users'].remove(user)
+
+    data['channels'] = channels
+    print(data)
     return jsonify(data)
 
 
@@ -104,9 +122,19 @@ def join_channel(name):
         current_channel[session.get('user')] = 'general'
         emit("new user", session.get('user'), broadcast=True)
 
-    if name is not 0:
+    elif name in current_channel:
+        names = [session.get('user'), name]
+        names.sort()
+        chat_name = '-'.join(names)
+        if chat_name not in messages:
+            messages[chat_name] = []
+        current_channel[session.get('user')] = chat_name
+
+    elif name is not 0:
         current_channel[session.get('user')] = name
+
     join_room(session.get('user'))
+    print(f"joined channel {current_channel[session.get('user')]}")
 
 
 @socketio.on("join chat")
@@ -125,6 +153,7 @@ def new_messsage(data):
 
     message = Message(data)
     messages[current_channel[session.get('user')]].append(message.__dict__)
+    print(f"added {message}")
     for user in current_channel:
         if current_channel[user] == current_channel[session.get('user')]:
             emit("new message", message.__dict__, room=user, broadcast=True)

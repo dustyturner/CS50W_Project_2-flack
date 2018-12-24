@@ -6,10 +6,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         socket.emit('join channel', name=0);
 
-        /*function load_messages() {
+        function load_messages() {
+
+            console.log("loading messages")
 
             //clear current messages
-            document.querySelector('#messages').innerHTML = ""
+            const content = document.querySelector('#messages');
+            while (content.firstChild) content.removeChild(content.firstChild)
 
             // Initialize new request
             const request = new XMLHttpRequest();
@@ -18,22 +21,54 @@ document.addEventListener('DOMContentLoaded', () => {
             request.onload = () => {
 
                 // Extract JSON data from request
-                const data = JSON.parse(request.responseText);
-                const template = Handlebars.compile(document.querySelector('#message').innerHTML)
+                const response = request.responseText;
 
-                for (message in data) {
-                    const p = document.createElement('p');
-                    p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
-                    document.querySelector('#messages').prepend(p);
+                if (response) {
+                    const data = JSON.parse(request.responseText);
+                    const template = Handlebars.compile(document.querySelector('#message').innerHTML)
+                    for (item in data) {
+                        console.log(item)
+                        const message = template({'user':data[item].user,
+                            'time': data[item].time,
+                            'message': data[item].message});
+                        document.querySelector('#messages').innerHTML += message;
+                    }
+                    messages = document.querySelectorAll('.message')
+                    last_message = messages[messages.length - 1]
+                    console.log(last_message.innerHTML)
+                    last_message.scrollIntoView({
+                        behaviour: "smooth"
+                    });
                 }
             }
             // Send request
             request.send();
         }
-        load_messages() */
 
+        load_messages()
+
+        // Button begins disabled by default
+        document.querySelector('#message_submit').disabled = true
+        // Enable button only if there is text in the input field
+        document.querySelector('#send_message').onkeyup = () => {
+            if (document.querySelector('#message_input').value.length > 0)
+                document.querySelector('#message_submit').disabled = false;
+            else
+                document.querySelector('#message_submit').disabled = true;
+        };
+
+        document.querySelector('#send_message').onsubmit = () => {
+            const message = document.querySelector('#message_input').value;
+            socket.emit('send message', message);
+            // Clear input field and disable button again
+            document.querySelector('#message_input').value = '';
+            document.querySelector('#message_submit').disabled = true;
+            return false;
+        };
 
         function load_channels() {
+
+                const template = Handlebars.compile(document.querySelector('#channel').innerHTML)
 
             // Initialize new request
             const request = new XMLHttpRequest();
@@ -42,36 +77,51 @@ document.addEventListener('DOMContentLoaded', () => {
             // Callback function for when request completes
             request.onload = () => {
 
+                document.querySelector('#dms').innerHTML = "";
+                document.querySelector('#channels').innerHTML = "";
+
                 // Extract JSON data from request
                 const data = JSON.parse(request.responseText);
-                const template = Handlebars.compile(document.querySelector('#channel').innerHTML)
 
-                for (item in data) {
-                const channel = template({'name':data[item]})
-                    document.querySelector('#channels').innerHTML += channel
+                channels = data['channels']
+                users = data['users']
+                current_channel = data['current_channel']
+                console.log(current_channel)
+
+                for (channel in channels) {
+                const content = template({'name': channels[channel]})
+                    document.querySelector('#channels').innerHTML += content;
                 }
 
-                channels = document.querySelectorAll('.channel')
-                channels.forEach(channel => {
-                    channel.onclick = () => {
-                        channels.forEach(channel => {
-                            channel.style.backgroundColor = "#ffc27c";
+                for (user in users) {
+                const content = template({'name': users[user]})
+                    document.querySelector('#dms').innerHTML += content;
+                }
+
+                chats = document.querySelectorAll('.channel')
+                chats.forEach(chat => {
+                    if (chat.innerHTML == current_channel) {
+                        chat.style.backgroundColor = "white";
+                    }
+                    chat.onclick = () => {
+                        chats.forEach(chat => {
+                            chat.style.backgroundColor = "#ffc27c";
                         })
-                        channel.style.backgroundColor = "white";
-                        console.log("emmitting " + channel.innerHTML)
-                        socket.emit('join channel', channel.innerHTML)
+                        chat.style.backgroundColor = "white";
+                        socket.emit('join channel', chat.innerHTML)
+                        load_messages()
                     }
                 })
+
             }
-            // Send request
             request.send();
         };
         load_channels()
 
+        // Add Channel
 
-        // Button begins disabled by default
         document.querySelector('#channel_submit').disabled = true
-        // Enable button only if there is text in the input field
+
         document.querySelector('#create_channel').onkeyup = () => {
             if (document.querySelector('#channel_input').value.length > 0)
                 document.querySelector('#channel_submit').disabled = false;
@@ -84,8 +134,24 @@ document.addEventListener('DOMContentLoaded', () => {
             socket.emit('create channel', name)
             document.querySelector('#channel_input').value = '';
             document.querySelector('#channel_submit').disabled = true;
+            load_messages()
             return false;
         };
 
+        socket.on('new channel', name => {
+            load_channels()
+        });
+
+        socket.on('new user', name => {
+            load_channels()
+        });
+
+        socket.on('new message', new_message => {
+                    const template = Handlebars.compile(document.querySelector('#message').innerHTML)
+                    const message = template({'user':new_message.user,
+                        'time': new_message.time,
+                        'message': new_message.message});
+                document.querySelector('#messages').innerHTML += message;
+        });
     });
 });

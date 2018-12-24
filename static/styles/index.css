@@ -122,7 +122,6 @@ h1 {
 }
 
 #dms {
-    margin-top: 70px;
 }
 
 #users .dropdown-toggle {
@@ -175,9 +174,10 @@ h1 {
 }
 
 .list-group-item {
-    margin: 5px;
-    margin-left: 10px;
     border: none;
+    margin: auto;
+    margin-left: 0px;
+    margin-bottom: 10px;
     box-shadow: 0px 0px 3px -0px #dc0000;
     border-radius: 5px;
 }
@@ -185,6 +185,7 @@ h1 {
 .list-group-item h6 {
     font-weight: bold;
     margin-top: 10px;
+    margin: auto;
     color: #dc0000;
 }
 
@@ -195,6 +196,7 @@ h1 {
 
 .list-group-item p {
     margin: 3px;
+    margin: auto;
     margin-left: 0px;
 }
 
@@ -204,9 +206,13 @@ h1 {
 
 #messages {
     position: fixed;
+    padding: 10px;
     overflow-y: auto;
     right: 0;
-    bottom: 110px;
+    margin-bottom: 5px;
+    padding-top: 230px;
+    margin-bottom: 20px;
+    bottom: 100px;
     left: 250px;
     height: 100;
     max-height: 100%;
@@ -215,13 +221,13 @@ h1 {
 
 #new_message {
     position: fixed;
+    margin: 10px;
     bottom: 0px;
     margin-bottom: 0px;
     left: 250px;
     right: 0px;
     bottom: 0;
     background: white;
-    box-shadow: 0px 0px 5px 5px white;
     transition: all 0.3s;
 }
 

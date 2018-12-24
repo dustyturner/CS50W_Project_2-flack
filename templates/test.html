@@ -47,14 +47,8 @@
                         <button type=submit class="btn btn-primary btn-danger" id="channel_submit">create</button>
                     </form>
                 </div>
+                <p>DMs:</p>
                 <div id="dms">
-                    <p>DMs:</p>
-                    <li>
-                        <a href="#" class="channel" onClick=fuckyeah()>fuckbeast</a>
-                    </li>
-                    <li>
-                        <a href="#" class="channel">shitface</a>
-                    </li>
                     <!-- <li>
                        <div id="users">
                             <a href="#pageSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">send a DM:</a>
@@ -91,110 +85,26 @@
                     <p class="offline">knoblegs</p>
                 </div>
             </nav>
-            <div id="messages">
-                <ul class="list-group">
-                    <script id="message" type="text/template">
-                        {% raw -%}
-                        <li class="list-group-item">
-                            <h6>{{ user }}</h6>
-                            <div class="d-flex justify-content-between">
-                                <p>{{ message }}</p>
-                                <small>{{ time  }}</small>
-                            </div>
-                        </li>
-                        {%- endraw %}
-                    </script>
-                    <li class="list-group-item">
-                        <h6>shitbag</h6>
+            <div>
+                <script id="message" type="text/template">
+                    {% raw -%}
+                    <li class="message list-group-item">
+                        <h6>{{ user }}</h6>
                         <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
+                            <p>{{ message }}</p>
                             <small>{{ time  }}</small>
                         </div>
                     </li>
-                    <li class="list-group-item">
-                        <h6>asswank</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>shitbag</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>asswank</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>shitbag</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>asswank</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>shitbag</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>asswank</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>shitbag</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>asswank</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>shitbag</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
-                    <li class="list-group-item">
-                        <h6>asswank</h6>
-                        <div class="d-flex justify-content-between">
-                            <p>Hello you shit bag of cocks</p>
-                            <small>{{ time  }}</small>
-                        </div>
-                    </li>
+                    {%- endraw %}
+                </script>
+                <ul class="list-group" id="messages">
                 </ul>
             </div>
             <div id="new_message">
                 <form class="form-group" id="send_message">
-                    <input class="form-control" type="text" id="message" name="message" placehmder="type message...." autofocus>
+                    <input class="form-control" type="text" id="message_input" name="message" placehmder="type message...." autofocus>
                     <div class="form-group my-2">
-                        <button class="btn btn-primary btn-danger" type="submit" id="submit_message">send</button>
+                        <button class="btn btn-primary btn-danger" type="message_submit" id="message_submit">send</button>
                     </div>
                 </form>
             </div>
