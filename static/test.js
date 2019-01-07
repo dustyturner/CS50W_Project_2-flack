@@ -8,11 +8,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function load_messages() {
 
-            console.log("loading messages")
-
             //clear current messages
             const content = document.querySelector('#messages');
             while (content.firstChild) content.removeChild(content.firstChild)
+            document.querySelector('#chatting').innerHTML = "<h6>chatting:</h6>"
 
             // Initialize new request
             const request = new XMLHttpRequest();
@@ -25,20 +24,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (response) {
                     const data = JSON.parse(request.responseText);
-                    const template = Handlebars.compile(document.querySelector('#message').innerHTML)
-                    for (item in data) {
-                        console.log(item)
-                        const message = template({'user':data[item].user,
-                            'time': data[item].time,
-                            'message': data[item].message});
+                    const message_template = Handlebars.compile(document.querySelector('#message').innerHTML)
+                    for (item in data['messages']) {
+                        const message = message_template({'user':data['messages'][item].user,
+                            'time': data['messages'][item].time,
+                            'message': data['messages'][item].message});
                         document.querySelector('#messages').innerHTML += message;
                     }
+                    for (item in data['chatting']) {
+                        const p = document.createElement('p')
+                        p.innerHTML = data['chatting'][item]
+                        document.querySelector('#chatting').append(p)
+                    }
                     messages = document.querySelectorAll('.message')
-                    last_message = messages[messages.length - 1]
-                    console.log(last_message.innerHTML)
-                    last_message.scrollIntoView({
-                        behaviour: "smooth"
-                    });
+                    if (messages.length > 0) {
+                        last_message = messages[messages.length - 1]
+                        last_message.scrollIntoView({
+                            behaviour: "smooth"
+                        });
+                    }
                 }
             }
             // Send request
@@ -86,7 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 channels = data['channels']
                 users = data['users']
                 current_channel = data['current_channel']
-                console.log(current_channel)
 
                 for (channel in channels) {
                 const content = template({'name': channels[channel]})

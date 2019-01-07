@@ -26,7 +26,7 @@ class Message:
 
 messages = {'general': []}
 channels = ['general']
-current_channel = {'shitface': 'general', 'fuckbeast': 'general'}
+current_channel = {}
 
 @app.route("/login", methods=("GET","POST"))
 def login():
@@ -51,52 +51,52 @@ def index():
     if session.get("user") is None:
         return redirect("/login")
 
-    return render_template("index.html", channels=messages)
-
-
-@app.route("/test")
-def test():
-
     return render_template("test.html")
 
 
 @app.route("/get_messages")
 def get_messages():
 
-    if session.get("user") not in current_channel:
-        current_channel[session.get("user")] = 'general'
-        emit('new user', session.get("user"), broadcast=True)
+    data = {'chatting': [], 'messages': []}
+    current_user = session.get('user')
 
-    channel = current_channel[session.get("user")]
+    if current_user not in current_channel:
+        current_channel[current_user] = 'general'
+        emit('new user', current_user, broadcast=True)
+
+    channel = current_channel[current_user]
 
     try:
         channel_messages = messages[channel]
+        data['messages'] = messages[channel]
     except:
         channel_messages = 0
 
-    if channel_messages:
-        print(f"returning {channel_messages}")
-        return jsonify(channel_messages)
+    for user in current_channel:
+        if current_channel[user] == current_channel[current_user]:
+            data['chatting'].append(user)
 
-    print("returning no messages")
-    return "";
+    print(data)
+    return jsonify(data)
+
 
 
 @app.route("/get_channels")
 def get_channels():
 
-    user = session.get('user')
-    data = {'users': [], 'channels': [], 'current_channel': {}}
+    current_user = session.get('user')
+    data = {'users': [], 'channels': [], 'current_channel': '', 'chatting': []}
 
     try:
-        data['current_channel'] = current_channel[user].split("-")
-        data['current_channel'].remove(user)
+        data['current_channel'] = current_channel[current_user].split("-")
+        data['current_channel'].remove(current_user)
     except:
-        data['current_channel'] = current_channel[user]
+        data['current_channel'] = current_channel[current_user]
 
     for user in current_channel:
         data['users'].append(user)
-    data['users'].remove(user)
+        if current_channel[user] == current_channel[current_user]:
+            data['chatting'].append(user)
 
     data['channels'] = channels
     print(data)
@@ -153,7 +153,10 @@ def new_messsage(data):
 
     message = Message(data)
     messages[current_channel[session.get('user')]].append(message.__dict__)
-    print(f"added {message}")
+
+    if len(messages[current_channel[session.get('user')]]) > 100:
+        del messages[current_channel[session.get('user')]][0]
+
     for user in current_channel:
         if current_channel[user] == current_channel[session.get('user')]:
             emit("new message", message.__dict__, room=user, broadcast=True)
