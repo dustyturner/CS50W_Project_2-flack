@@ -49,7 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
             request.send();
         }
 
-        load_messages()
+        socket.on('channel_joined', () => {
+            load_messages()
+        });
 
         // Button begins disabled by default
         document.querySelector('#message_submit').disabled = true
@@ -112,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         })
                         chat.style.backgroundColor = "white";
                         socket.emit('join channel', chat.innerHTML)
-                        load_messages()
                     }
                 })
 
@@ -141,20 +142,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         };
 
-        socket.on('new channel', name => {
+        socket.on('new channel', () => {
             load_channels()
         });
 
-        socket.on('new user', name => {
+        socket.on('new user', () => {
             load_channels()
         });
 
         socket.on('new message', new_message => {
-                    const template = Handlebars.compile(document.querySelector('#message').innerHTML)
-                    const message = template({'user':new_message.user,
-                        'time': new_message.time,
-                        'message': new_message.message});
-                document.querySelector('#messages').innerHTML += message;
+            load_messages()
         });
     });
 });

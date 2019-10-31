@@ -134,6 +134,7 @@ def join_channel(name):
         current_channel[session.get('user')] = name
 
     join_room(session.get('user'))
+    emit("channel_joined", room=session.get('user'), broadcast=True)
     print(f"joined channel {current_channel[session.get('user')]}")
 
 
