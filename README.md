@@ -22,11 +22,6 @@ Pretty self-explanatory template / stylesheet for the login screen. The login sc
 
 <h3> index.html / index.css / index.js </h3>
 
-* navbar css & script toggleclass
-* socket.on blah blah
-* request object / xmlhttpblah / html routes in flask
-* handlebars
-
 These three files make up the main page of the site, including all of the client-side script that allows the user to communicate with the server whilst interacting with the page. The following are some key features that warrant highlighting:
 
 * <h4> SocketIO </h4> A SocketIO connection is formed at the beginning of <code>index.js</code> by calling <code>io.connect(....)</code>. The conncection is stored in an object called <code>socket</code>, which is used to listen for the <code>emit</code> messages coming from the server via the <code>socket.on(...)</code> and emit its own messages via the <code>socket.emit(....)</code> methods. 
