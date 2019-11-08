@@ -8,17 +8,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function load_messages() {
 
-            //clear current messages
-            const message_content = document.querySelector('#messages');
-            while (message_content.firstChild) message_content.removeChild(message_content.firstChild)
-            document.querySelector('#chatting').innerHTML = "<h6>chatting:</h6>"
-            document.querySelector('#title_channel').innerHTML = ""
 
             // Initialize new request
             const request = new XMLHttpRequest();
             request.open('GET', '/get_messages');
             // Callback function for when request completes
             request.onload = () => {
+
+                //clear current messages
+                const message_content = document.querySelector('#messages');
+                while (message_content.firstChild) message_content.removeChild(message_content.firstChild)
+                document.querySelector('#chatting').innerHTML = "<h6>chatting:</h6>"
+                document.querySelector('#title_channel').innerHTML = ""
 
                 // Extract JSON data from request
                 const response = request.responseText;
