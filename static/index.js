@@ -9,7 +9,10 @@ document.addEventListener('DOMContentLoaded', () => {
         function load_messages() {
 
             //clear current messages
-            document.querySelector('#messages').innerHTML = ""
+            const message_content = document.querySelector('#messages');
+            while (message_content.firstChild) message_content.removeChild(message_content.firstChild)
+            document.querySelector('#chatting').innerHTML = "<h6>chatting:</h6>"
+            document.querySelector('#title_channel').innerHTML = ""
 
             // Initialize new request
             const request = new XMLHttpRequest();
@@ -18,132 +21,140 @@ document.addEventListener('DOMContentLoaded', () => {
             request.onload = () => {
 
                 // Extract JSON data from request
-                const data = JSON.parse(request.responseText);
+                const response = request.responseText;
 
-                for (message in data) {
-                    const p = document.createElement('p');
-                    p.innerHTML = "<b>" + data[message].user +  "</b> " + " " + data[message].time + " - " + data[message].message
-                    document.querySelector('#messages').prepend(p);
+                if (response) {
+                    const data = JSON.parse(request.responseText);
+                    const message_template = Handlebars.compile(document.querySelector('#message').innerHTML)
+
+                    document.querySelector('#title_channel').innerHTML += '#' + data['channel'] 
+                    for (item in data['messages']) {
+                        const message = message_template({'user':data['messages'][item].user,
+                            'time': data['messages'][item].time,
+                            'message': data['messages'][item].message});
+                        document.querySelector('#messages').innerHTML += message;
+                    }
+                    for (item in data['chatting']) {
+                        const p = document.createElement('p')
+                        p.innerHTML = data['chatting'][item]
+                        document.querySelector('#chatting').append(p)
+                    }
+                    messages = document.querySelectorAll('.message')
+                    if (messages.length > 0) {
+                        last_message = messages[messages.length - 1]
+                        last_message.scrollIntoView({
+                            behaviour: "smooth"
+                        });
+                    }
                 }
             }
             // Send request
             request.send();
         }
-        load_messages()
+
+        socket.on('channel_joined', () => {
+            load_messages()
+            load_channels()
+        });
+
+        // Button begins disabled by default
+        document.querySelector('#message_submit').disabled = true
+        // Enable button only if there is text in the input field
+        document.querySelector('#send_message').onkeyup = () => {
+            if (document.querySelector('#message_input').value.length > 0)
+                document.querySelector('#message_submit').disabled = false;
+            else
+                document.querySelector('#message_submit').disabled = true;
+        };
+
+        document.querySelector('#send_message').onsubmit = () => {
+            const message = document.querySelector('#message_input').value;
+            socket.emit('send message', message);
+            // Clear input field and disable button again
+            document.querySelector('#message_input').value = '';
+            document.querySelector('#message_submit').disabled = true;
+            return false;
+        };
 
         function load_channels() {
 
-            //clear current channels
-            document.querySelector('#channels').innerHTML = ""
+            const template = Handlebars.compile(document.querySelector('#channel').innerHTML)
 
             // Initialize new request
             const request = new XMLHttpRequest();
             request.open('GET', '/get_channels');
+
             // Callback function for when request completes
             request.onload = () => {
+
+                document.querySelector('#dms').innerHTML = "";
+                document.querySelector('#channels').innerHTML = "";
 
                 // Extract JSON data from request
                 const data = JSON.parse(request.responseText);
 
-                for (item in data) {
-                    const channel = data[item]
-                    const button = document.createElement('button');
-                    button.innerHTML = channel;
-                    button.onclick = () => {
-                        console.log(channel)
-                        socket.emit('join channel', channel);
-                        load_messages()
-                    };
-                    document.querySelector('#channels').append(button);
+                channels = data['channels']
+                users = data['users']
+                current_channel = data['current_channel']
+
+                for (channel in channels) {
+                const content = template({'name': channels[channel]})
+                    document.querySelector('#channels').innerHTML += content;
                 }
+
+                for (user in users) {
+                const content = template({'name': users[user]})
+                    document.querySelector('#dms').innerHTML += content;
+                }
+
+                chats = document.querySelectorAll('.channel')
+                chats.forEach(chat => {
+                    if (chat.innerHTML == current_channel) {
+                        chat.style.backgroundColor = "white";
+                    }
+                    chat.onclick = () => {
+                        chats.forEach(chat => {
+                            chat.style.backgroundColor = "#ffc27c";
+                        })
+                        chat.style.backgroundColor = "white";
+                        socket.emit('join channel', chat.innerHTML)
+                    }
+                })
+
             }
-            // Send request
             request.send();
-        }
+        };
         load_channels()
 
-        function load_users() {
+        // Add Channel
 
-            //clear current users
-            document.querySelector('#users').innerHTML = ""
+        document.querySelector('#channel_submit').disabled = true
 
-            // Initialize new request
-            const request = new XMLHttpRequest();
-            request.open('GET', '/get_users');
-            // Callback function for when request completes
-            request.onload = () => {
-
-                // Extract JSON data from request
-                const data = JSON.parse(request.responseText);
-
-                for (item in data) {
-                    const user = data[item]
-                    const button = document.createElement('button');
-                    button.innerHTML = user;
-                    button.onclick = () => {
-                        console.log(user)
-                        socket.emit('join chat', user);
-                        load_messages()
-                    };
-                    document.querySelector('#users').append(button);
-                }
-            }
-            // Send request
-            request.send();
-        }
-        load_users()
-
-        // Button begins disabled by default
-        document.querySelector('#submit_message').disabled = true
-        // Enable button only if there is text in the input field
-        document.querySelector('#send_message').onkeyup = () => {
-            if (document.querySelector('#message').value.length > 0)
-                document.querySelector('#submit_message').disabled = false;
-            else
-                document.querySelector('#submit_message').disabled = true;
-        };
-
-        document.querySelector('#send_message').onsubmit = () => {
-            const message = document.querySelector('#message').value;
-            socket.emit('send message', message);
-            // Clear input field and disable button again
-            document.querySelector('#message').value = '';
-            document.querySelector('#submit_message').disabled = true;
-            return false;
-        };
-
-        // Button begins disabled by default
-        document.querySelector('#submit_channel').disabled = true
-        // Enable button only if there is text in the input field
         document.querySelector('#create_channel').onkeyup = () => {
-            if (document.querySelector('#channel_name').value.length > 0)
-                document.querySelector('#submit_channel').disabled = false;
+            if (document.querySelector('#channel_input').value.length > 0)
+                document.querySelector('#channel_submit').disabled = false;
             else
-                document.querySelector('#submit_channel').disabled = true;
+                document.querySelector('#channel_submit').disabled = true;
         };
 
         document.querySelector('#create_channel').onsubmit = () => {
-            const name = document.querySelector('#channel_name').value;
+            const name = document.querySelector('#channel_input').value;
             socket.emit('create channel', name)
-            document.querySelector('#channel_name').value = '';
-            document.querySelector('#submit_channel').disabled = true;
-            load_messages()
+            document.querySelector('#channel_input').value = '';
+            document.querySelector('#channel_submit').disabled = true;
             return false;
         };
 
-        socket.on('new channel', name => {
+        socket.on('new channel', () => {
             load_channels()
         });
 
-        socket.on('new user', name => {
-            load_users()
+        socket.on('new user', () => {
+            load_channels()
         });
 
-        socket.on('new message', message => {
-            console.log(message);
-            const p = document.createElement('p');
-            p.innerHTML = "<b>" + message.user +  "</b> " + " " + message.time + " - " + message.message;
-            document.querySelector('#messages').prepend(p);
+        socket.on('new message', new_message => {
+            load_messages()
         });
     });
 });

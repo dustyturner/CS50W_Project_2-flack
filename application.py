@@ -16,9 +16,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 class Message:
-
     def __init__(self, message):
-
         self.user = session['user']
         self.time = strftime("%H:%M", localtime())
         self.message = message
@@ -51,7 +49,7 @@ def index():
     if session.get("user") is None:
         return redirect("/login")
 
-    return render_template("test.html")
+    return render_template("index.html")
 
 
 @app.route("/get_messages")
@@ -65,6 +63,7 @@ def get_messages():
         emit('new user', current_user, broadcast=True)
 
     channel = current_channel[current_user]
+    data['channel'] = channel
 
     try:
         channel_messages = messages[channel]
@@ -112,6 +111,7 @@ def create_channel(name):
         channels.append(name)
         emit("new channel", name, broadcast=True)
     current_channel[session.get('user')] = name
+    emit("channel_joined", broadcast=True)
 
 
 @socketio.on("join channel")
@@ -134,8 +134,7 @@ def join_channel(name):
         current_channel[session.get('user')] = name
 
     join_room(session.get('user'))
-    emit("channel_joined", room=session.get('user'), broadcast=True)
-    print(f"joined channel {current_channel[session.get('user')]}")
+    emit("channel_joined", broadcast=True)
 
 
 @socketio.on("join chat")
