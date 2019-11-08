@@ -1,11 +1,10 @@
 import os
 import requests
-import datetime
+from time import strftime, localtime
 
-from flask import Flask, jsonify, render_template, redirect, request, session, url_for
+from flask import Flask, jsonify, render_template, redirect, request, session
 from flask_session import Session
 from flask_socketio import SocketIO, emit, join_room
-from functools import wraps
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
@@ -16,97 +15,148 @@ app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
-channels = {}
+class Message:
+    def __init__(self, message):
+        self.user = session['user']
+        self.time = strftime("%H:%M", localtime())
+        self.message = message
 
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if session.get("user") is None:
-            return redirect("/login")
-        return f(*args, **kwargs)
-    return decorated_function
+
+messages = {'general': []}
+channels = ['general']
+current_channel = {}
 
 @app.route("/login", methods=("GET","POST"))
 def login():
 
+    session.clear()
+
     if request.method == "POST":
-        user = request.form.get("user")
-        if not user:
-            print("no user biatch!!")
+        username = request.form.get("username")
+        if not username:
             return render_template('login.html', error = "enter username")
         else:
             session.clear()
-            session['user'] = user
-            session['channel'] = 'general'
+            session['user'] = username
             return redirect("/")
     else:
         return render_template("login.html")
-        
+
 
 @app.route("/")
-@login_required
 def index():
 
-    print("user: " + session['user'] + "is using channel: " + session['channel'])
-    return render_template("index.html", channels=channels)
+    if session.get("user") is None:
+        return redirect("/login")
 
-@app.route("/channel/<string:name>")
-@login_required
-def channel(name):
-
-    session['channel'] = name
-    print("user: " + session['user'] + "is using channel: " + session['channel'])
-    return render_template("channel.html", name=name)
-
-@app.route("/create_channel", methods=["POST"])
-def create_channel():
-    
-    name = request.form.get("name")
-    if name in channels:
-        error = "Channel already exists"
-        print(error)
-    
-    else:
-        channels[name] = [] 
-        session['channel'] = name
-        print("user: " + session['user'] + "is using channel: " + session['channel'])
-        return redirect(url_for('channel', name=name))
-    return redirect("/")
-
-@app.route("/get_messages/<string:channel>")
-def get_messages(channel):
-    messages = channels[channel]
-    return jsonify(messages)
+    return render_template("index.html")
 
 
+@app.route("/get_messages")
+def get_messages():
 
-@socketio.on("connected")
-def connected():
+    data = {'chatting': [], 'messages': []}
+    current_user = session.get('user')
 
-    print("user: " + session['user'] + " using channel: " + session['channel'] + " connected")
-    join_room(session['channel'])
-    emit("new user", session['user'], room=session['channel'], broadcast=True)      
+    if current_user not in current_channel:
+        current_channel[current_user] = 'general'
+        emit('new user', current_user, broadcast=True)
+
+    channel = current_channel[current_user]
+    data['channel'] = channel
+
+    try:
+        channel_messages = messages[channel]
+        data['messages'] = messages[channel]
+    except:
+        channel_messages = 0
+
+    for user in current_channel:
+        if current_channel[user] == current_channel[current_user]:
+            data['chatting'].append(user)
+
+    print(data)
+    return jsonify(data)
+
+
+
+@app.route("/get_channels")
+def get_channels():
+
+    current_user = session.get('user')
+    data = {'users': [], 'channels': [], 'current_channel': '', 'chatting': []}
+
+    try:
+        data['current_channel'] = current_channel[current_user].split("-")
+        data['current_channel'].remove(current_user)
+    except:
+        data['current_channel'] = current_channel[current_user]
+
+    for user in current_channel:
+        data['users'].append(user)
+        if current_channel[user] == current_channel[current_user]:
+            data['chatting'].append(user)
+
+    data['channels'] = channels
+    print(data)
+    return jsonify(data)
+
+
+@socketio.on("create channel")
+def create_channel(name):
+
+    print(f"creating {name}")
+    if name not in messages:
+        messages[name] = []
+        channels.append(name)
+        emit("new channel", name, broadcast=True)
+    current_channel[session.get('user')] = name
+    emit("channel_joined", broadcast=True)
+
+
+@socketio.on("join channel")
+def join_channel(name):
+
+    print(f"joining channel {name}")
+    if session.get('user') not in current_channel:
+        current_channel[session.get('user')] = 'general'
+        emit("new user", session.get('user'), broadcast=True)
+
+    elif name in current_channel:
+        names = [session.get('user'), name]
+        names.sort()
+        chat_name = '-'.join(names)
+        if chat_name not in messages:
+            messages[chat_name] = []
+        current_channel[session.get('user')] = chat_name
+
+    elif name is not 0:
+        current_channel[session.get('user')] = name
+
+    join_room(session.get('user'))
+    emit("channel_joined", broadcast=True)
+
+
+@socketio.on("join chat")
+def join_chat(username):
+
+    names = [session.get('user'), username]
+    names.sort()
+    chat_name = '-'.join(names)
+    if chat_name not in messages:
+        messages[chat_name] = []
+    current_channel[session.get('user')] = chat_name
+
 
 @socketio.on("send message")
-def new_messsage(message):
-    
-    print(message)
-    if not message:
-        error = "Enter a message"
-        print(error)
+def new_messsage(data):
 
-    else:
-        now = datetime.datetime.now()
-        time = str(now.hour) + ":" + str(now.minute)
+    message = Message(data)
+    messages[current_channel[session.get('user')]].append(message.__dict__)
 
-        new_message = {}
-        new_message['user'] = session['user']
-        new_message['time'] = time
-        new_message['message'] = message
+    if len(messages[current_channel[session.get('user')]]) > 100:
+        del messages[current_channel[session.get('user')]][0]
 
-        print(time)
-        print(new_message)
-        channels[session['channel']].append([session['user'], time, message]) 
-        print(channels)
-        emit("new message", new_message, room=session['channel'], broadcast=True)
-        
+    for user in current_channel:
+        if current_channel[user] == current_channel[session.get('user')]:
+            emit("new message", message.__dict__, room=user, broadcast=True)
