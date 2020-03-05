@@ -93,7 +93,8 @@ def get_channels():
         data['current_channel'] = current_channel[current_user]
 
     for user in current_channel:
-        data['users'].append(user)
+        if not user == current_user:
+            data['users'].append(user)
         if current_channel[user] == current_channel[current_user]:
             data['chatting'].append(user)
 
