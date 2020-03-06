@@ -36,6 +36,8 @@ These three files make up the main page of the site, including all of the client
 
 This is a simple shell script that runs the terminal commands required to run the flask application in one go, rather than having to type them individually each time the server is started. 
 
-<h2> Personal Touch </h2>
+<h3> Personal Touch(es) </h3>
 
 As briefly mentioned above, the application includes the ability to privately message any of the current users. Each of the users appears along with the available channels under the heading DMs; users may select another user in the same way as a channel and send messages that will only be received by that user. 
+
+The app also features a collapseable sidebar - the sidebar includes all of the different chat groups and can be minimised to  make extra space for the messages on screen
